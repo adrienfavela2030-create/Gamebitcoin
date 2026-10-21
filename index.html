@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>Crypto Empire — Bitcoin Clicker</title>
+<style>
+:root{--bg:#080d16;--line:#2a3b54;--text:#eff6ff;--muted:#91a4bd;--gold:#ffbd45;--green:#58e0a0;--red:#ff6e79;--blue:#65baff;--purple:#b99aff;--ac:#ffbd45}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -15%,#233c62 0%,transparent 55%),linear-gradient(150deg,#080d16,#0b1422 55%,#080d16);background-attachment:fixed;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;transition:background .8s}
+body.day{background:radial-gradient(ellipse at 50% -15%,#4d6484 0%,transparent 55%),linear-gradient(150deg,#111c2b,#14253a 55%,#0b1422);background-attachment:fixed}
+body.bull{box-shadow:inset 0 0 90px #58e0a022}body.bear{box-shadow:inset 0 0 90px #ff6e7922}
+button,input{font:inherit}
+button{color:var(--text);background:linear-gradient(145deg,#263852,#17253a);border:1px solid #344b69;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;transition:transform .12s,border-color .12s,filter .12s}
+button:hover{border-color:var(--gold);filter:brightness(1.12)}button:active{transform:scale(.97)}
+button:disabled{opacity:.4;cursor:not-allowed}button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:#080e18ef;border-bottom:1px solid var(--line);backdrop-filter:blur(16px);padding:12px 15px;padding-top:max(12px,env(safe-area-inset-top))}
+.head{max-width:1180px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-size:clamp(19px,4vw,28px);font-weight:900;letter-spacing:1px}.brand span{color:var(--gold)}
+.tag{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:3px}
+.headright{text-align:right}.rank{color:var(--gold);font-weight:900;font-size:12px}
+.clock{font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px;margin-top:4px}
+main{max-width:1180px;margin:auto;padding:15px}
+#banner{display:none;margin-bottom:10px;padding:11px 14px;border-radius:14px;border:1px solid var(--ac);background:#1d3048;font-weight:800;font-size:13px;text-align:center}
+#banner.show{display:block;animation:pop .4s}@keyframes pop{from{transform:scale(.96);opacity:0}}
+.topgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tile,.panel{border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#172338ee,#0e1726f5);box-shadow:0 12px 30px #0002}
+.tile{padding:14px;min-width:0}.tile small{color:var(--muted);font-size:10px;letter-spacing:1px;font-weight:800}
+.tile strong{display:block;font-size:clamp(17px,3.5vw,26px);margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.tile em{font-style:normal;font-size:10px;color:var(--green);display:block;margin-top:5px}
+.layout{display:grid;grid-template-columns:1.08fr .92fr;gap:13px;margin-top:13px}
+.panel{padding:16px;min-width:0}
+.sectiontitle{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:14px}
+.pill{border:1px solid var(--line);background:#1b2b41;border-radius:999px;padding:5px 9px;color:var(--muted);font-size:10px;letter-spacing:0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.chips button{padding:7px 10px;font-size:12px;white-space:nowrap}.chips button.on{border-color:var(--ac);background:#3a3020;color:#ffe1a0}.chips button.lock{opacity:.35}
+.coinzone{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.coinzone:before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:var(--ac);opacity:.07;filter:blur(25px)}
+.coin{position:relative;z-index:1;width:176px;height:176px;border-radius:50%;border:5px solid #ffe0a0;background:radial-gradient(circle at 32% 23%,#fff1ba,#ffbd45 25%,#bb6b16 68%,#6c3c0b);box-shadow:0 0 0 8px #ffc14d18,0 0 55px #ffbd4545,inset 0 -9px 20px #65350070;color:#4c2a06;display:flex;align-items:center;justify-content:center;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;filter:hue-rotate(var(--hue,0deg))}
+.coin:after{content:"";position:absolute;inset:13px;border:2px dashed #70400c88;border-radius:50%;pointer-events:none}
+.coin .symbol{font-size:56px;font-weight:900;line-height:1}.coin .coinlabel{font-size:10px;font-weight:900;letter-spacing:2px;margin-top:3px}
+.coin.mining{animation:cp .22s}@keyframes cp{50%{transform:scale(.94)}}
+.hint{color:var(--muted);font-size:12px;margin:15px 0 5px}.earn{font-size:15px;color:var(--gold);font-weight:900}
+.combo{width:70%;max-width:260px;height:6px;background:#27364b;border-radius:9px;overflow:hidden;margin-top:10px}
+.combo div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.combotxt{font-size:11px;color:var(--purple);margin-top:4px;height:14px;font-weight:800}
+.float{position:absolute;z-index:5;color:#ffe09a;font-weight:900;pointer-events:none;animation:fu .85s forwards;text-shadow:0 2px 8px #000}
+.float.stock{color:#7be7b0}.float.crit{color:#fff;font-size:20px;text-shadow:0 0 14px var(--gold),0 2px 8px #000}
+@keyframes fu{to{opacity:0;transform:translateY(-75px) scale(1.25)}}
+.miniStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.mini{padding:12px;background:#1a2940;border-radius:12px;border:1px solid #263a55;min-width:0}
+.mini small{font-size:10px;color:var(--muted);letter-spacing:.7px}.mini strong{display:block;margin-top:5px;font-size:19px;overflow-wrap:anywhere}
+.positive{color:var(--green)!important}.negative{color:var(--red)!important}
+.progress{height:7px;background:#27364b;border-radius:10px;overflow:hidden;margin-top:6px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--gold),#fff0ac);transition:width .25s}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:14px 0 4px;scrollbar-width:thin}
+.tabs button{white-space:nowrap;font-size:12px}.tabs button.active{border-color:var(--gold);background:#4a391f;color:#ffe1a0}
+.page{display:none;margin-top:12px}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:linear-gradient(145deg,#1b2a40,#101a2a);border:1px solid var(--line);border-radius:14px;padding:13px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h3{margin:0;font-size:14px}.card p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;flex:1}
+.cost{color:var(--gold);font-size:12px;font-weight:900}.owned{color:var(--green);font-size:11px}.card button{width:100%;font-size:12px}
+.card.done{border-color:#2f6b52}
+.marketrow{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border-bottom:1px solid #283950;padding:12px 0}
+.marketrow:last-child{border-bottom:0}.assetname{font-weight:900}.assetdesc{font-size:11px;color:var(--muted);margin-top:3px}
+.marketright{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.price{font-weight:900;font-variant-numeric:tabular-nums}.change{font-size:11px}
+.spark{width:90px;height:26px}
+.actionrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actionrow button{flex:1}
+.danger{border-color:#82424b;color:#ffb6bd}.secondary{color:var(--blue)}
+.qty{display:flex;gap:6px;margin-bottom:12px}.qty button{flex:1;padding:7px;font-size:12px}.qty button.on{border-color:var(--gold);background:#4a391f;color:#ffe1a0}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;background:#1d3048;border:1px solid var(--gold);border-radius:12px;padding:12px 17px;box-shadow:0 8px 30px #0008;max-width:90%;font-size:13px;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+footer{text-align:center;padding:25px;color:#70849d;font-size:10px;letter-spacing:1px}
+@media(max-width:760px){main{padding:10px}.layout{grid-template-columns:1fr}.topgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.coin{width:160px;height:160px}.cards{gap:8px}.card{padding:10px}}
+@media(max-width:370px){.cards{grid-template-columns:1fr}.brand{font-size:18px}.tile{padding:11px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="head">
+<div><div class="brand">₿ CRYPTO <span>EMPIRE</span></div><div class="tag">CLICK • INVEST • BUILD YOUR FORTUNE</div></div>
+<div class="headright"><div class="rank" id="rank">ROOKIE TRADER</div><div class="clock" id="clock">DAY 1 · 12:00 PM</div></div>
+</div></header>
+<main>
+<div id="banner"></div>
+<div class="topgrid" id="topStats"></div>
+<div class="layout">
+<section class="panel">
+<div class="sectiontitle"><span>Mining Rig</span><span class="pill" id="marketStatus">MARKET OPEN</span></div>
+<div class="chips" id="chips"></div>
+<div class="coinzone" id="coinzone">
+<button class="coin" id="btcButton" aria-label="Hold to mine"><span class="symbol" id="coinSym">₿</span><span class="coinlabel" id="coinLbl">BITCOIN</span></button>
+<div class="hint">HOLD THE COIN · CHAIN CLICKS FOR COMBOS · LUCKY CRITS ×5</div><div class="earn" id="btcEarn"></div>
+<div class="combo"><div id="comboBar"></div></div><div class="combotxt" id="comboTxt"></div>
+</div>
+<div class="progress"><div id="xpBar"></div></div><p class="note" id="levelText">Level 1</p>
+<div class="miniStats">
+<div class="mini"><small>BITCOIN BALANCE</small><strong id="btcBalance">0 BTC</strong></div>
+<div class="mini"><small>BTC VALUE (SIMULATED)</small><strong id="btcValue">$0</strong></div>
+<div class="mini"><small>BTC PER SECOND</small><strong id="btcRate">0</strong></div>
+<div class="mini"><small>TOTAL CLICKS</small><strong id="clicks">0</strong></div>
+</div>
+</section>
+<section class="panel">
+<div class="sectiontitle"><span>Trading Floor</span><span class="pill" id="daypart">DAYTIME</span></div>
+<div class="miniStats">
+<div class="mini"><small>PORTFOLIO VALUE</small><strong id="portfolio">$0</strong></div>
+<div class="mini"><small>DIVIDENDS / SEC</small><strong id="dividends">$0</strong></div>
+<div class="mini"><small>MARKET MOOD</small><strong id="mood">Steady</strong></div>
+<div class="mini"><small>INVESTOR LEVEL</small><strong id="playerLevel">1</strong></div>
+</div>
+<p class="note" id="marketNote" style="margin-top:13px">Prices move in this game simulation. These are not real market prices.</p>
+<div class="actionrow"><button onclick="buyGlobalUpgrade()">🚀 Boost All Earnings</button><button onclick="buyAutoMiner()">🤖 Buy Auto Miner</button></div>
+<div class="actionrow"><button class="secondary" onclick="sellAsset('btc')">💰 Sell All Bitcoin</button><button class="secondary" onclick="sellAllAssets()">💱 Sell Everything</button></div>
+<div class="note" id="upgradeSummary" style="margin-top:10px"></div>
+</section>
+</div>
+<nav class="tabs" aria-label="Game sections">
+<button class="active" data-page="market">📈 Market</button><button data-page="upgrades">⚡ Upgrades</button><button data-page="portfolioPage">💼 Portfolio</button><button data-page="missions">🎯 Missions</button><button data-page="achievements">🏆 Achievements</button><button data-page="rebirth">♻ Prestige</button><button data-page="saves">💾 Saves</button>
+</nav>
+<section class="page active" id="market"><div class="panel"><div class="sectiontitle"><span>Live Simulated Market</span><span class="pill">GAME PRICES</span></div><p class="note">Mine assets, then sell them for game cash to buy upgrades. Prices swing with market mood and random events.</p><div id="assetMarket"></div></div></section>
+<section class="page" id="upgrades"><div class="panel"><div class="sectiontitle"><span>Research & Upgrades</span><span class="pill">RESET ON PRESTIGE</span></div><div class="qty" id="qty"></div><div class="cards" id="upgradeCards"></div></div></section>
+<section class="page" id="portfolioPage"><div class="panel"><div class="sectiontitle"><span>Your Portfolio</span><span class="pill">OWNERSHIP</span></div><div id="portfolioRows"></div><div class="actionrow"><button onclick="sellAllAssets()">💱 Sell Everything</button><button onclick="collectDividends()">🏦 Collect Dividends</button></div><p class="note">Selling converts holdings to game dollars at the simulated price. Fictional money, not real investing.</p></div></section>
+<section class="page" id="missions"><div class="panel"><div class="sectiontitle"><span>Missions</span><span class="pill">CLAIM REWARDS</span></div><div class="cards" id="missionCards"></div></div></section>
+<section class="page" id="achievements"><div class="panel"><div class="sectiontitle"><span>Achievements</span><span class="pill">MILESTONES</span></div><div class="cards" id="achievementCards"></div></div></section>
+<section class="page" id="rebirth"><div class="panel"><div class="sectiontitle"><span>Prestige Protocol</span><span class="pill">PERMANENT BONUS</span></div><h2 style="margin-top:0">Reset. Rise. Dominate.</h2><p class="note">Prestige resets balances, holdings and upgrades. Earn Empire Stars that permanently boost every asset (+20% each).</p><div class="miniStats"><div class="mini"><small>PRESTIGE REQUIREMENT</small><strong id="prestigeNeed">$1,000,000</strong></div><div class="mini"><small>STARS TO EARN</small><strong id="prestigeGain">0</strong></div><div class="mini"><small>EMPIRE STARS</small><strong id="stars">0</strong></div><div class="mini"><small>PRESTIGES COMPLETED</small><strong id="prestiges">0</strong></div></div><button style="width:100%;margin-top:13px" onclick="prestige()">♻ START PRESTIGE</button></div></section>
+<section class="page" id="saves"><div class="panel"><div class="sectiontitle"><span>Save Management</span><span class="pill">LOCAL SAVE</span></div><p class="note">Progress saves in this browser automatically. Export a backup before clearing browser data or changing devices.</p><div class="actionrow"><button onclick="exportSave()">⬇ Export .txt Save</button><button onclick="$('importFile').click()">⬆ Import Save</button></div><input id="importFile" type="file" accept=".txt,.json,text/plain,application/json" hidden><div class="actionrow"><button class="secondary" onclick="saveGame(true)">💾 Save Now</button><button class="danger" onclick="resetGame()">Reset Game</button></div><div class="miniStats" style="margin-top:13px"><div class="mini"><small>TIME PLAYED</small><strong id="playTime">0 min</strong></div><div class="mini"><small>LIFETIME GAME VALUE</small><strong id="lifetime">$0</strong></div><div class="mini"><small>CRITICAL HITS</small><strong id="critStat">0</strong></div><div class="mini"><small>BEST COMBO</small><strong id="bestCombo">0</strong></div></div></div></section>
+</main>
+<footer>CRYPTO EMPIRE · SINGLE HTML FILE · SIMULATED GAME ECONOMY · NOT FINANCIAL ADVICE</footer>
+<div id="toast"></div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const fmt=n=>{if(!Number.isFinite(n))return "∞";if(Math.abs(n)<1000)return n.toLocaleString(undefined,{maximumFractionDigits:4});const u=["K","M","B","T","Qa","Qi"];let i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}return n.toFixed(n<10?2:n<100?1:0)+u[i]};
+const money=n=>"$"+fmt(n);
+const fresh=()=>({version:1,btc:0,cash:250,clicks:0,level:1,xp:0,lifetimeValue:0,globalLevel:0,btcLevel:0,autoMiners:0,assetLevels:{},holdings:{},unlocked:{btc:true,eth:false,sol:false,doge:false,tech:false,ev:false},prices:{btc:65000,eth:3200,sol:145,doge:.16,tech:180,ev:220},priceChanges:{},owned:{},claimed:{},achievements:{},stars:0,prestiges:0,rebirthProgress:0,gameDay:1,gameMinutes:720,playSeconds:0,lastTime:Date.now(),marketMood:0,history:{},crits:0,bestCombo:0});
+let s=fresh(),toastTimer=null,lastTick=Date.now(),marketTick=0,holdTimer=null,holdPointer=null,sel="btc",buyAmt=1,combo=0,lastClick=0,evt=null,evtCool=40,pressed=false,renderDirty=0;
+const assets=[
+{id:"btc",name:"Bitcoin",symbol:"₿",kind:"crypto",currency:"BTC",desc:"The original digital asset.",base:65000,earn:.000001,unlock:0,icon:"₿",hue:0},
+{id:"eth",name:"Ethereum",symbol:"Ξ",kind:"crypto",currency:"ETH",desc:"A programmable blockchain asset.",base:3200,earn:.00002,unlock:500,icon:"Ξ",hue:200},
+{id:"sol",name:"Solana",symbol:"◎",kind:"crypto",currency:"SOL",desc:"A fast network token.",base:145,earn:.0004,unlock:2500,icon:"◎",hue:250},
+{id:"doge",name:"Dogecoin",symbol:"Ð",kind:"crypto",currency:"DOGE",desc:"A playful community coin.",base:.16,earn:.03,unlock:10000,icon:"Ð",hue:-10},
+{id:"tech",name:"TechNova Shares",symbol:"TN",kind:"stock",currency:"TN shares",desc:"Fictional technology company shares.",base:180,earn:.01,unlock:25000,icon:"▣",hue:170},
+{id:"ev",name:"Volt Motors",symbol:"VM",kind:"stock",currency:"VM shares",desc:"Fictional electric vehicle shares.",base:220,earn:.008,unlock:75000,icon:"ϟ",hue:90}
+];
+const upgrades=[
+{id:"btcLevel",name:"Better Mining Rig",desc:"Earn more Bitcoin with every click.",base:80,max:100},
+{id:"globalLevel",name:"Universal Multiplier",desc:"+25% to every asset click, per level.",base:500,max:100},
+{id:"autoMiners",name:"Auto Mining Bots",desc:"Passively mine BTC, plus a trickle of every unlocked asset.",base:350,max:100},
+{id:"ethBoost",name:"Altcoin Lab",desc:"Improve earnings from all crypto assets.",base:1500,max:50},
+{id:"stockBoost",name:"Trading Algorithms",desc:"Increase earnings from all stock assets.",base:5000,max:50},
+{id:"dividend",name:"Dividend Engine",desc:"Generate game dollars every second.",base:10000,max:50}
+];
+const nUnl=()=>Object.values(s.unlocked).filter(Boolean).length;
+const missions=[
+{id:"click25",name:"Warm-Up Trader",desc:"Click any asset 25 times.",reward:250,check:()=>s.clicks>=25},
+{id:"cash1k",name:"First Thousand",desc:"Reach $1,000 game cash.",reward:500,check:()=>s.cash>=1000},
+{id:"btc100",name:"Bitcoin Collector",desc:"Own 0.0001 BTC.",reward:600,check:()=>s.btc>=.0001},
+{id:"unlock2",name:"Diversify",desc:"Unlock two extra assets.",reward:1000,check:()=>nUnl()>=3},
+{id:"portfolio10k",name:"Growing Portfolio",desc:"Reach $10,000 total portfolio value.",reward:2000,check:()=>portfolioValue()>=10000},
+{id:"bots5",name:"Robot Army",desc:"Own 5 Auto Mining Bots.",reward:3000,check:()=>(s.assetLevels.autoMiners||0)>=5},
+{id:"combo30",name:"In the Zone",desc:"Reach a 30× click combo.",reward:4000,check:()=>s.bestCombo>=30},
+{id:"portfolio250k",name:"Quarter Million",desc:"Reach $250,000 portfolio value.",reward:25000,check:()=>portfolioValue()>=250000}
+];
+const achievements=[
+{id:"first",name:"First Click",desc:"Click your first asset.",reward:100,check:()=>s.clicks>=1},
+{id:"hundred",name:"Click Machine",desc:"Click 100 times.",reward:500,check:()=>s.clicks>=100},
+{id:"rich",name:"Five Figures",desc:"Reach $10,000 portfolio value.",reward:1500,check:()=>portfolioValue()>=10000},
+{id:"collector",name:"Asset Collector",desc:"Unlock all six assets.",reward:5000,check:()=>nUnl()===6},
+{id:"prestige",name:"Empire Reborn",desc:"Prestige for the first time.",reward:2500,check:()=>s.prestiges>=1},
+{id:"thousand",name:"Click Legend",desc:"Click 1,000 times.",reward:4000,check:()=>s.clicks>=1000},
+{id:"lucky",name:"Lucky Strike",desc:"Land 10 critical hits.",reward:3000,check:()=>s.crits>=10},
+{id:"mil",name:"Millionaire",desc:"Reach $1,000,000 portfolio value.",reward:50000,check:()=>portfolioValue()>=1e6}
+];
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.remove("show"),2200)}
+const A=id=>assets.find(x=>x.id===id);
+function globalMult(){return (1+(s.assetLevels.globalLevel||0)*.25)*(1+s.stars*.2)}
+function assetBoost(id){const a=A(id);let sp=1;if(a.kind==="crypto")sp+=(s.assetLevels.ethBoost||0)*.12;else sp+=(s.assetLevels.stockBoost||0)*.12;if(id==="btc")sp+=(s.assetLevels.btcLevel||0)*.35;return globalMult()*sp*(evt&&evt.type==="halving"?2:1)}
+function clickReward(a){return a.earn*(1+(s.assetLevels["asset_"+a.id]||0)*.5)*assetBoost(a.id)}
+function assetValue(a){return (a.id==="btc"?s.btc:(s.holdings[a.id]||0))*(s.prices[a.id]||a.base)}
+function portfolioValue(){return s.cash+assets.reduce((t,a)=>t+assetValue(a),0)}
+function totalIncome(){return (s.assetLevels.autoMiners||0)*clickReward(assets[0])*5}
+function passiveOf(a){return a.id==="btc"?totalIncome():s.unlocked[a.id]?(s.assetLevels.autoMiners||0)*clickReward(a):0}
+function costOf(key,lv){const u=upgrades.find(x=>x.id===key);if(u)return Math.floor(u.base*Math.pow(1.65,lv));const a=A(key.slice(6));return Math.floor(100*Math.pow(1.9,lv)*(a.base/100))}
+function maxOf(key){const u=upgrades.find(x=>x.id===key);return u?u.max:999}
+function plan(key){const lv=s.assetLevels[key]||0,mx=maxOf(key);let n=0,tot=0,cash=s.cash;const want=buyAmt==="max"?mx:buyAmt;while(n<want&&lv+n<mx){const c=costOf(key,lv+n);if(buyAmt==="max"?tot+c>s.cash:false)break;tot+=c;n++}if(n===0&&lv<mx)return{n:1,cost:costOf(key,lv),afford:s.cash>=costOf(key,lv)};return{n,cost:tot,afford:n>0&&s.cash>=tot}}
+function showFloat(a,amount,crit){let f=document.createElement("div");f.className="float"+(a.kind==="stock"?" stock":"")+(crit?" crit":"");f.textContent=(crit?"CRIT! +":"+")+(amount<1?amount.toFixed(6):fmt(amount))+" "+a.currency;let r=$("coinzone").getBoundingClientRect();f.style.left=(r.width/2-65+(Math.random()-.5)*100)+"px";f.style.top=(r.height/2-25)+"px";$("coinzone").appendChild(f);setTimeout(()=>f.remove(),900)}
+function addAsset(id,amt){if(id==="btc")s.btc+=amt;else s.holdings[id]=(s.holdings[id]||0)+amt;s.lifetimeValue+=amt*(s.prices[id]||A(id).base)}
+function clickAsset(id){const a=A(id);if(!a||!s.unlocked[id])return;const now=Date.now();combo=now-lastClick<700?Math.min(50,combo+1):1;lastClick=now;if(combo>s.bestCombo)s.bestCombo=combo;let crit=Math.random()<.08;let amount=clickReward(a)*(1+combo*.01)*(crit?5:1);if(crit)s.crits++;addAsset(id,amount);s.clicks++;s.xp+=crit?3:1;while(s.xp>=s.level*30){s.xp-=s.level*30;s.level++;toast("Investor level "+s.level+" reached!")}showFloat(a,amount,crit);const b=$("btcButton");b.classList.remove("mining");void b.offsetWidth;b.classList.add("mining");refresh(true)}
+function stopHold(){if(holdTimer!==null){clearInterval(holdTimer);holdTimer=null}holdPointer=null}
+$("btcButton").addEventListener("pointerdown",e=>{if(e.button!==undefined&&e.button!==0)return;e.preventDefault();if(holdTimer!==null)return;holdPointer=e.pointerId;try{$("btcButton").setPointerCapture(e.pointerId)}catch(_){}clickAsset(sel);holdTimer=setInterval(()=>clickAsset(sel),120)});
+$("btcButton").addEventListener("pointerup",e=>{if(holdPointer===e.pointerId)stopHold()});
+$("btcButton").addEventListener("pointercancel",stopHold);
+$("btcButton").addEventListener("lostpointercapture",stopHold);
+$("btcButton").addEventListener("contextmenu",e=>e.preventDefault());
+window.addEventListener("blur",stopHold);
+document.addEventListener("pointerdown",()=>pressed=true,true);
+document.addEventListener("pointerup",()=>{pressed=false;if(renderDirty){renderDirty=0;renderPages()}},true);
+document.addEventListener("pointercancel",()=>pressed=false,true);
+function selectAsset(id){if(!s.unlocked[id]){toast("Unlock "+A(id).name+" in the Market first.");return}sel=id;refresh()}
+function unlockAsset(id){const a=A(id);if(!a||s.unlocked[id])return;if(s.cash<a.unlock){toast("Need "+money(a.unlock)+" to unlock this asset.");return}s.cash-=a.unlock;s.unlocked[id]=true;toast(a.name+" unlocked!");refresh(true)}
+function buyAssetUpgrade(id){buyKey("asset_"+id)}
+function buyUpgrade(id){buyKey(id)}
+function buyKey(key){const mx=maxOf(key),lv=s.assetLevels[key]||0;if(lv>=mx){toast("Upgrade maxed!");return}const p=plan(key);if(!p.afford){toast("Need "+money(p.cost)+" cash.");return}s.cash-=p.cost;s.assetLevels[key]=lv+p.n;toast("Upgraded ×"+p.n+"!");refresh(true)}
+function buyGlobalUpgrade(){buyUpgrade("globalLevel")}
+function buyAutoMiner(){buyUpgrade("autoMiners")}
+function sellAsset(id){const a=A(id);const n=id==="btc"?s.btc:(s.holdings[id]||0);const v=n*(s.prices[id]||a.base);if(v<=0){toast("No "+a.currency+" to sell.");return}s.cash+=v;if(id==="btc")s.btc=0;else s.holdings[id]=0;toast("Sold "+a.name+" for "+money(v)+".");refresh(true)}
+function sellAllAssets(){let total=0;for(const a of assets){const v=assetValue(a);total+=v;if(a.id==="btc")s.btc=0;else s.holdings[a.id]=0}if(total<=0){toast("Nothing to sell yet. Mine some assets first.");return}s.cash+=total;toast("Sold everything for "+money(total)+".");refresh(true)}
+function dividendRate(){let lv=s.assetLevels.dividend||0;return lv*2+assets.filter(a=>a.kind==="stock").reduce((t,a)=>t+assetValue(a)*.00005,0)}
+function collectDividends(){let amount=dividendRate()*10;if(amount<=0){toast("Upgrade Dividend Engine and collect again soon.");return}s.cash+=amount;toast("Collected "+money(amount)+" in dividend rewards!");refresh(true)}
+function setEvt(e){evt=e;const b=$("banner");b.textContent=e.msg;b.classList.add("show");setTimeout(()=>{if(evt===e){evt=null;b.classList.remove("show");document.body.classList.remove("bull","bear")}},e.dur*1000)}
+function maybeEvent(){if(evt)return;const r=Math.random();if(r<.3)setEvt({type:"bull",dur:25,msg:"🐂 BULL RUN — prices are surging!"});else if(r<.55)setEvt({type:"bear",dur:25,msg:"🐻 MARKET DIP — prices falling. Buy-and-hold or sell now?"});else if(r<.8)setEvt({type:"halving",dur:30,msg:"⛏ HALVING FRENZY — all click earnings ×2!"});else{const g=Math.max(50,Math.floor(portfolioValue()*.03));s.cash+=g;setEvt({type:"airdrop",dur:6,msg:"🎁 AIRDROP — you received "+money(g)+"!"})}if(evt&&evt.type==="bull")document.body.classList.add("bull");if(evt&&evt.type==="bear")document.body.classList.add("bear")}
+function doMarketTick(){const hour=Math.floor(s.gameMinutes/60);s.marketMood=Math.sin((s.gameDay*24+s.gameMinutes/60)/5)+((Math.random()-.5)*.8);const bias=evt?(evt.type==="bull"?.012:evt.type==="bear"?-.012:0):0;for(const a of assets){const old=s.prices[a.id]||a.base;const vol=a.id==="doge"?.025:a.kind==="stock"?.012:.016;const dayBoost=(hour>=9&&hour<16)?1.15:.8;let pct=((Math.random()-.48)*vol*dayBoost)+(s.marketMood*.001)+bias;let next=Math.max(a.base*.15,old*(1+pct));s.priceChanges[a.id]=(next-old)/old;s.prices[a.id]=next;const h=s.history[a.id]=s.history[a.id]||[];h.push(next);if(h.length>30)h.shift()}}
+function dayPart(){let h=Math.floor(s.gameMinutes/60);return h<5?"LATE NIGHT":h<8?"SUNRISE":h<12?"MORNING":h<17?"DAYTIME":h<20?"SUNSET":"NIGHT"}
+function advanceTime(dt){s.gameMinutes+=dt*4;while(s.gameMinutes>=1440){s.gameMinutes-=1440;s.gameDay++}document.body.classList.toggle("day",s.gameMinutes>=360&&s.gameMinutes<1080)}
+function prestige(){const v=portfolioValue();if(v<1e6){toast("Reach a $1,000,000 portfolio value first.");return}const gain=Math.max(1,Math.floor(Math.sqrt(v/1e6)));if(!confirm("Prestige for "+gain+" Empire Star(s)? Balances, holdings and regular upgrades reset."))return;const keep={stars:s.stars+gain,prestiges:s.prestiges+1,clicks:s.clicks,level:s.level,playSeconds:s.playSeconds,lifetimeValue:s.lifetimeValue,achievements:s.achievements,claimed:s.claimed,crits:s.crits,bestCombo:s.bestCombo};s=Object.assign(fresh(),keep);sel="btc";toast("Prestige complete! Permanent multiplier increased.");refresh(true);saveGame()}
+function spark(a){const h=s.history[a.id]||[];if(h.length<2)return "";const mn=Math.min(...h),mx=Math.max(...h),r=mx-mn||1;const pts=h.map((v,i)=>(i/(h.length-1)*90).toFixed(1)+","+(24-(v-mn)/r*22).toFixed(1)).join(" ");const up=h[h.length-1]>=h[0];return `<svg class="spark" viewBox="0 0 90 26"><polyline fill="none" stroke="${up?"#58e0a0":"#ff6e79"}" stroke-width="2" points="${pts}"/></svg>`}
+function renderMarket(){$("assetMarket").innerHTML=assets.map(a=>{let un=s.unlocked[a.id],p=s.prices[a.id]||a.base,ch=(s.priceChanges[a.id]||0)*100,e=clickReward(a);const qty=a.id==="btc"?s.btc:(s.holdings[a.id]||0);return `<div class="marketrow"><div><div class="assetname">${a.icon} ${a.name} <span class="pill">${a.kind.toUpperCase()}</span></div><div class="assetdesc">${a.desc}</div><div class="assetdesc">Price: ${money(p)} · Click earns ${e<1?e.toFixed(6):fmt(e)} ${a.currency}${passiveOf(a)>0?` · Auto ${passiveOf(a).toFixed(6)}/s`:""}</div></div><div class="marketright">${un?`<div class="price">${money(p)}</div><div class="change ${ch>=0?"positive":"negative"}">${ch>=0?"+":""}${ch.toFixed(2)}%</div>${spark(a)}<div style="display:flex;gap:6px"><button onclick="selectAsset('${a.id}')">${sel===a.id?"⛏ Mining":"Mine"}</button><button class="secondary" onclick="sellAsset('${a.id}')" ${qty*p<=0?"disabled":""}>Sell</button></div>`:`<div class="price">${money(a.unlock)}</div><div class="change">Unlock asset</div><button onclick="unlockAsset('${a.id}')" ${s.cash<a.unlock?"disabled":""}>Unlock</button>`}</div></div>`}).join("")}
+function upCard(key,name,desc,icon){const lv=s.assetLevels[key]||0,mx=maxOf(key),max=lv>=mx,p=plan(key);return `<article class="card ${max?"done":""}"><h3>${icon} ${name}</h3><p>${desc}</p><div class="owned">Level ${lv}${mx<999?"/"+mx:""}</div><div class="cost">${max?"MAX LEVEL":"Cost: "+money(p.cost)+(p.n>1?" (×"+p.n+")":"")}</div><button onclick="buyKey('${key}')" ${max||!p.afford?"disabled":""}>${max?"Fully Upgraded":"Purchase Upgrade"}</button></article>`}
+function renderUpgrades(){$("qty").innerHTML=[1,10,"max"].map(q=>`<button class="${buyAmt===q?"on":""}" onclick="buyAmt=${q==="max"?'"max"':q};renderPages()">${q==="max"?"Max":"×"+q}</button>`).join("");$("upgradeCards").innerHTML=upgrades.map(u=>upCard(u.id,u.name,u.desc,"⚡")).join("")+assets.filter(a=>a.id!=="btc"&&s.unlocked[a.id]).map(a=>upCard("asset_"+a.id,a.name+" Click Power","Earn more "+a.currency+" per click (+50% each).","🎯")).join("")+(nUnl()<6?`<article class="card"><h3>🔒 More upgrades</h3><p>Unlock assets in the Market to reveal their click power upgrades.</p></article>`:"")}
+function renderPortfolio(){$("portfolioRows").innerHTML=assets.map(a=>{let qty=a.id==="btc"?s.btc:(s.holdings[a.id]||0);return `<div class="marketrow"><div><div class="assetname">${a.icon} ${a.name}</div><div class="assetdesc">Owned: ${qty.toFixed(a.id==="doge"?2:6)} ${a.currency}</div></div><div class="marketright"><div class="price">${money(qty*(s.prices[a.id]||a.base))}</div><div class="assetdesc">Market value</div></div></div>`}).join("")}
+function renderMissions(){$("missionCards").innerHTML=missions.map(m=>{let c=!!s.claimed[m.id],r=m.check();return `<article class="card ${c?"done":""}"><h3>🎯 ${m.name}</h3><p>${m.desc}</p><div class="cost">Reward: ${money(m.reward)}</div><button onclick="claimMission('${m.id}')" ${c||!r?"disabled":""}>${c?"Claimed":r?"Claim Reward":"In Progress"}</button></article>`}).join("")}
+function claimMission(id){let m=missions.find(x=>x.id===id);if(!m||s.claimed[id]||!m.check())return;s.claimed[id]=true;s.cash+=m.reward;toast("Mission complete! +"+money(m.reward));refresh(true)}
+function renderAchievements(){$("achievementCards").innerHTML=achievements.map(a=>{let c=!!s.achievements[a.id],r=a.check();return `<article class="card ${c?"done":""}"><h3>🏆 ${a.name}</h3><p>${a.desc}</p><div class="cost">Reward: ${money(a.reward)}</div><button onclick="claimAchievement('${a.id}')" ${c||!r?"disabled":""}>${c?"Completed":r?"Claim Reward":"Locked"}</button></article>`}).join("")}
+function claimAchievement(id){let a=achievements.find(x=>x.id===id);if(!a||s.achievements[id]||!a.check())return;s.achievements[id]=true;s.cash+=a.reward;toast("Achievement claimed! +"+money(a.reward));refresh(true)}
+function renderChips(){$("chips").innerHTML=assets.map(a=>`<button class="${sel===a.id?"on":""} ${s.unlocked[a.id]?"":"lock"}" onclick="selectAsset('${a.id}')">${a.icon} ${a.currency.split(" ")[0]}</button>`).join("")}
+function renderPages(){renderMarket();renderUpgrades();renderPortfolio();renderMissions();renderAchievements();renderChips()}
+function refresh(pages){const a0=A(sel);let pv=portfolioValue();$("topStats").innerHTML=[["GAME CASH",money(s.cash),"Spend on upgrades"],["BITCOIN",s.btc.toFixed(6)+" BTC","Simulated crypto balance"],["PORTFOLIO",money(pv),"Cash + asset values"],["EMPIRE STARS",fmt(s.stars),"+"+s.stars*20+"% permanent bonus"]].map(x=>`<div class="tile"><small>${x[0]}</small><strong>${x[1]}</strong><em>${x[2]}</em></div>`).join("");
+$("rank").textContent=s.level<5?"ROOKIE TRADER":s.level<10?"MARKET EXPLORER":s.level<20?"CRYPTO SPECIALIST":s.level<40?"WALL STREET WIZARD":"CRYPTO EMPIRE LEGEND";
+let h=Math.floor(s.gameMinutes/60),m=Math.floor(s.gameMinutes%60);$("clock").textContent=`DAY ${s.gameDay} · ${String(h%12||12).padStart(2,"0")}:${String(m).padStart(2,"0")} ${h>=12?"PM":"AM"}`;$("daypart").textContent=dayPart();$("marketStatus").textContent=h>=9&&h<16?"MARKET OPEN":"AFTER HOURS";
+$("coinSym").textContent=a0.symbol;$("coinLbl").textContent=a0.name.toUpperCase();$("btcButton").style.setProperty("--hue",a0.hue+"deg");$("coinzone").style.setProperty("--ac",["#ffbd45","#9caaff","#b99aff","#f3d66d","#65baff","#58e0a0"][assets.indexOf(a0)]);
+const er=clickReward(a0);$("btcEarn").textContent="+"+(er<1?er.toFixed(6):fmt(er))+" "+a0.currency+" / CLICK";
+if(Date.now()-lastClick>700)combo=0;$("comboBar").style.width=combo/50*100+"%";$("comboTxt").textContent=combo>1?combo+"× COMBO · +"+combo+"% earnings":"";
+$("btcBalance").textContent=s.btc.toFixed(6)+" BTC";$("btcValue").textContent=money(s.btc*(s.prices.btc||65000));$("btcRate").textContent=totalIncome().toFixed(6)+" BTC";$("clicks").textContent=fmt(s.clicks);
+$("portfolio").textContent=money(pv);$("dividends").textContent=money(dividendRate());$("mood").textContent=s.marketMood>.25?"Bullish":s.marketMood<-.25?"Bearish":"Steady";$("mood").className=s.marketMood>.25?"positive":s.marketMood<-.25?"negative":"";$("playerLevel").textContent=s.level;
+$("xpBar").style.width=Math.min(100,s.xp/(s.level*30)*100)+"%";$("levelText").textContent=`INVESTOR LEVEL ${s.level} · ${s.xp}/${s.level*30} XP`;
+$("upgradeSummary").textContent=`Global multiplier ×${globalMult().toFixed(2)} · Auto miners: ${s.assetLevels.autoMiners||0} · Sell assets for cash to buy upgrades`;
+$("prestigeGain").textContent=pv>=1e6?fmt(Math.max(1,Math.floor(Math.sqrt(pv/1e6)))):"Need "+money(1e6-pv);$("prestigeNeed").textContent=pv>=1e6?"READY":money(1e6);$("stars").textContent=fmt(s.stars);$("prestiges").textContent=s.prestiges;
+$("playTime").textContent=Math.floor(s.playSeconds/60)+" min";$("lifetime").textContent=money(s.lifetimeValue);$("critStat").textContent=fmt(s.crits);$("bestCombo").textContent=s.bestCombo;
+if(!$("marketNote").dataset.hold)$("marketNote").textContent=`${dayPart()} · Day ${s.gameDay}. Prices move every few seconds in this fictional market.`;
+if(pages===true)renderPages();else renderDirty=1}
+function saveGame(show=false){try{s.lastTime=Date.now();localStorage.setItem("cryptoEmpireSaveV1",JSON.stringify(s));if(show)toast("Game saved successfully!")}catch(e){toast("Could not save in this browser. Export a backup.")}}
+function exportSave(){s.lastTime=Date.now();const blob=new Blob([JSON.stringify(s,null,2)],{type:"text/plain"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="crypto_empire_save.txt";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("Save exported!")}
+function merge(obj){let base=fresh();return {...base,...obj,assetLevels:{...base.assetLevels,...obj.assetLevels},holdings:{...base.holdings,...obj.holdings},unlocked:{...base.unlocked,...obj.unlocked},prices:{...base.prices,...obj.prices},priceChanges:{...base.priceChanges,...obj.priceChanges},claimed:{...base.claimed,...obj.claimed},achievements:{...base.achievements,...obj.achievements},history:{...base.history,...obj.history}}}
+$("importFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{let obj=JSON.parse(await f.text());if(!obj||obj.version!==1||typeof obj.cash!=="number"||typeof obj.btc!=="number")throw Error("bad save");if(!confirm("Import this save and replace your current progress?"))return;s=merge(obj);sel="btc";saveGame();refresh(true);toast("Save imported!")}catch(err){toast("That save file is invalid or damaged.")}finally{e.target.value=""}});
+function resetGame(){if(!confirm("Reset all Crypto Empire progress in this browser? Export a backup first if needed."))return;stopHold();s=fresh();sel="btc";saveGame();refresh(true);toast("Fresh empire started.")}
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===b.dataset.page))}));
+function loadGame(){try{let raw=localStorage.getItem("cryptoEmpireSaveV1");if(raw){let obj=JSON.parse(raw);if(obj&&obj.version===1){s=merge(obj);let away=Math.min(8*3600,Math.max(0,(Date.now()-(obj.lastTime||Date.now()))/1000));if(away>10&&(s.assetLevels.autoMiners||0)){let msg=[];for(const a of assets){const e=passiveOf(a)*away;if(e>0){addAsset(a.id,e);if(a.id==="btc")msg.push(e.toFixed(6)+" BTC")}}$("marketNote").dataset.hold="1";$("marketNote").textContent="Welcome back! Your auto miners earned "+msg.join(", ")+" (plus other assets) while away.";setTimeout(()=>delete $("marketNote").dataset.hold,12000)}}}}catch(e){s=fresh();toast("Save could not load. A new game was started.")}}
+function tick(){let now=Date.now(),dt=Math.min(5,(now-lastTick)/1000);lastTick=now;s.playSeconds+=dt;advanceTime(dt);for(const a of assets){const g=passiveOf(a)*dt;if(g>0)addAsset(a.id,g)}s.cash+=dividendRate()*dt;marketTick+=dt;evtCool-=dt;if(marketTick>=3){marketTick=0;doMarketTick();if(!pressed)renderDirty=1}if(evtCool<=0){evtCool=45+Math.random()*60;maybeEvent()}refresh(false);if(renderDirty&&!pressed&&marketTick===0){renderDirty=0;renderPages()}}
+loadGame();doMarketTick();refresh(true);setInterval(tick,1000);setInterval(()=>saveGame(),5000);window.addEventListener("beforeunload",()=>saveGame());
+</script>
+</body>
+</html>
